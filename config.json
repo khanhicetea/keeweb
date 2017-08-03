@@ -43,7 +43,5 @@
   },
   "files": [],
   "showOnlyFilesFromConfig": false,
-  "plugins": [{
-    "url": ""
-  }]
+  "plugins": []
 }
