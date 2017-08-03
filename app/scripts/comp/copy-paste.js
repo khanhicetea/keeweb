@@ -1,16 +1,13 @@
-'use strict';
+const Launcher = require('./launcher');
+const AppSettingsModel = require('../models/app-settings-model');
 
-var FeatureDetector = require('../util/feature-detector'),
-    Launcher = require('./launcher'),
-    AppSettingsModel = require('../models/app-settings-model');
-
-var CopyPaste = {
+const CopyPaste = {
     simpleCopy: !!Launcher,
 
     copy: function(text) {
         if (Launcher) {
             Launcher.setClipboardText(text);
-            var clipboardSeconds = AppSettingsModel.instance.get('clipboardSeconds');
+            const clipboardSeconds = AppSettingsModel.instance.get('clipboardSeconds');
             if (clipboardSeconds > 0) {
                 setTimeout(() => {
                     if (Launcher.getClipboardText() === text) {
@@ -29,19 +26,11 @@ var CopyPaste = {
         }
     },
 
-    createHiddenInput: function(text, pos) {
-        var hiddenInput = $('<input/>')
+    createHiddenInput: function(text) {
+        const hiddenInput = $('<input/>')
             .val(text)
-            .attr({ type: 'text', 'class': pos ? '' : 'hide-by-pos' })
+            .attr({ type: 'text', 'class': 'hide-by-pos' })
             .appendTo(document.body);
-        if (FeatureDetector.canCopyReadonlyInput()) {
-            hiddenInput.attr('readonly', true);
-        }
-        if (pos) {
-            hiddenInput.css({ position: 'absolute', zIndex: 100, padding: '0 .6em',
-                border: 'none', background: 'transparent', color: 'transparent',
-                left: pos.left, top: pos.top, width: pos.width, height: pos.height });
-        }
         hiddenInput[0].selectionStart = 0;
         hiddenInput[0].selectionEnd = text.length;
         hiddenInput.focus();

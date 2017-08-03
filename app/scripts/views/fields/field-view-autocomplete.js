@@ -1,25 +1,26 @@
-'use strict';
+const FieldViewText = require('./field-view-text');
+const Keys = require('../../const/keys');
 
-var FieldViewText = require('./field-view-text');
-
-var FieldViewAutocomplete = FieldViewText.extend({
+const FieldViewAutocomplete = FieldViewText.extend({
     endEdit: function(newVal, extra) {
         if (this.autocomplete) {
             this.autocomplete.remove();
             this.autocomplete = null;
         }
+        delete this.selectedCopmletionIx;
         FieldViewText.prototype.endEdit.call(this, newVal, extra);
     },
 
     startEdit: function() {
         FieldViewText.prototype.startEdit.call(this);
-        var fieldRect = this.input[0].getBoundingClientRect();
+        const fieldRect = this.input[0].getBoundingClientRect();
         this.autocomplete = $('<div class="details__field-autocomplete"></div>').appendTo('body');
         this.autocomplete.css({
             top: fieldRect.bottom,
             left: fieldRect.left,
             width: fieldRect.width - 2
         });
+        delete this.selectedCopmletionIx;
         this.autocomplete.mousedown(this.autocompleteClick.bind(this));
         if (this.input.val()) {
             this.autocomplete.hide();
@@ -34,10 +35,44 @@ var FieldViewAutocomplete = FieldViewText.extend({
         FieldViewText.prototype.fieldValueInput.call(this, e);
     },
 
+    fieldValueKeydown: function(e) {
+        switch (e.which) {
+            case Keys.DOM_VK_UP:
+                this.moveAutocomplete(false);
+                e.preventDefault();
+                break;
+            case Keys.DOM_VK_DOWN:
+                this.moveAutocomplete(true);
+                e.preventDefault();
+                break;
+            case Keys.DOM_VK_RETURN:
+                const selectedItem = this.autocomplete.find('.details__field-autocomplete-item--selected').text();
+                if (selectedItem) {
+                    this.input.val(selectedItem);
+                    this.endEdit(selectedItem);
+                }
+                break;
+            default:
+                delete this.selectedCopmletionIx;
+        }
+        FieldViewText.prototype.fieldValueKeydown.call(this, e);
+    },
+
+    moveAutocomplete: function(next) {
+        const completions = this.model.getCompletions(this.input.val());
+        if (typeof this.selectedCopmletionIx === 'number') {
+            this.selectedCopmletionIx = (completions.length + this.selectedCopmletionIx + (next ? 1 : -1)) % completions.length;
+        } else {
+            this.selectedCopmletionIx = next ? 0 : completions.length - 1;
+        }
+        this.updateAutocomplete();
+    },
+
     updateAutocomplete: function() {
-        var completions = this.model.getCompletions(this.input.val());
-        var completionsHtml = completions.map(item => {
-            return '<div class="details__field-autocomplete-item">' + _.escape(item) + '</div>';
+        const completions = this.model.getCompletions(this.input.val());
+        const completionsHtml = completions.map((item, ix) => {
+            const sel = ix === this.selectedCopmletionIx ? 'details__field-autocomplete-item--selected' : '';
+            return '<div class="details__field-autocomplete-item ' + sel + '">' + _.escape(item) + '</div>';
         }).join('');
         this.autocomplete.html(completionsHtml);
         this.autocomplete.toggle(!!completionsHtml);
@@ -46,7 +81,7 @@ var FieldViewAutocomplete = FieldViewText.extend({
     autocompleteClick: function(e) {
         e.stopPropagation();
         if (e.target.classList.contains('details__field-autocomplete-item')) {
-            var selectedItem = $(e.target).text();
+            const selectedItem = $(e.target).text();
             this.input.val(selectedItem);
             this.endEdit(selectedItem);
         } else {

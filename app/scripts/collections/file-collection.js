@@ -1,9 +1,7 @@
-'use strict';
+const Backbone = require('backbone');
+const FileModel = require('../models/file-model');
 
-var Backbone = require('backbone'),
-    FileModel = require('../models/file-model');
-
-var FileCollection = Backbone.Collection.extend({
+const FileCollection = Backbone.Collection.extend({
     model: FileModel,
 
     hasOpenFiles: function() {

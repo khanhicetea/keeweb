@@ -1,8 +1,6 @@
-'use strict';
+const FieldViewText = require('./field-view-text');
 
-var FieldViewText = require('./field-view-text');
-
-var FieldViewUrl = FieldViewText.extend({
+const FieldViewUrl = FieldViewText.extend({
     displayUrlRegex: /^http:\/\//i,
 
     renderValue: function(value) {

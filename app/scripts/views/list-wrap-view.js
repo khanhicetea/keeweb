@@ -1,8 +1,6 @@
-'use strict';
+const Backbone = require('backbone');
 
-var Backbone = require('backbone');
-
-var ListWrapView = Backbone.View.extend({
+const ListWrapView = Backbone.View.extend({
     events: {
     },
 
@@ -15,7 +13,7 @@ var ListWrapView = Backbone.View.extend({
     },
 
     setListLayout: function() {
-        var tableView = this.model.settings.get('tableView');
+        const tableView = this.model.settings.get('tableView');
         this.$el.toggleClass('app__list-wrap--table', tableView);
     }
 });

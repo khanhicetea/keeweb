@@ -1,15 +1,14 @@
-'use strict';
+const Backbone = require('backbone');
+const EntryModel = require('../models/entry-model');
+const Comparators = require('../util/comparators');
 
-var Backbone = require('backbone'),
-    EntryModel = require('../models/entry-model'),
-    Comparators = require('../util/comparators');
-
-var EntryCollection = Backbone.Collection.extend({
+const EntryCollection = Backbone.Collection.extend({
     model: EntryModel,
 
-    comparator: function() {},
+    comparator: null,
 
     comparators: {
+        'none': null,
         'title': Comparators.stringComparator('title', true),
         '-title': Comparators.stringComparator('title', false),
         'website': Comparators.stringComparator('url', true),
@@ -25,8 +24,9 @@ var EntryCollection = Backbone.Collection.extend({
 
     defaultComparator: 'title',
 
-    initialize: function() {
-        this.comparator = this.comparators[this.defaultComparator];
+    initialize: function(models, options) {
+        const comparatorName = options && options.comparator || this.defaultComparator;
+        this.comparator = this.comparators[comparatorName];
     },
 
     sortEntries: function(comparator) {
@@ -35,8 +35,8 @@ var EntryCollection = Backbone.Collection.extend({
     },
 
     attachmentSortVal: function(entry) {
-        var att = entry.attachments;
-        var str = att.length ? String.fromCharCode(64 + att.length) : 'Z';
+        const att = entry.attachments;
+        let str = att.length ? String.fromCharCode(64 + att.length) : 'Z';
         if (att[0]) {
             str += att[0].title;
         }

@@ -1,6 +1,7 @@
 {
   "settings": {
     "theme": "fb",
+    "locale": "en",
     "expandGroups": true,
     "listViewWidth": null,
     "menuViewWidth": null,
@@ -25,23 +26,31 @@
     "canOpenSettings": true,
     "canCreate": true,
     "canImportXml": true,
+    "canRemoveLatest": true,
 
     "dropbox": true,
     "dropboxFolder": null,
     "dropboxAppKey": null,
 
     "webdav": true,
+    "webdavSaveMethod": "move",
 
     "gdrive": true,
     "gdriveClientId": null,
 
     "onedrive": true,
-    "onedriveClientId": null
+    "onedriveClientId": null,
+
+    "cacheConfigSettings": false
   },
   "files": [{
     "storage": "webdav",
     "name": "My file",
     "path": "webdav-url",
     "options": { "user": "", "password": "" }
-  }]
+  }],
+  "plugins": [{
+    "url": ""
+  }],
+  "showOnlyFilesFromConfig": false
 }

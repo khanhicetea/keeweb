@@ -1,14 +1,12 @@
-'use strict';
+const StorageBase = require('./storage-base');
+const UrlUtil = require('../util/url-util');
 
-var StorageBase = require('./storage-base'),
-    UrlUtil = require('../util/url-util');
-
-var OneDriveClientId = {
+const OneDriveClientId = {
     Production: '000000004818ED3A',
     Local: '0000000044183D18'
 };
 
-var StorageOneDrive = StorageBase.extend({
+const StorageOneDrive = StorageBase.extend({
     name: 'onedrive',
     enabled: true,
     uipos: 40,
@@ -36,14 +34,14 @@ var StorageOneDrive = StorageBase.extend({
                 return callback && callback(err);
             }
             this.logger.debug('Load', path);
-            var ts = this.logger.ts();
-            var url = this._baseUrl + path;
+            const ts = this.logger.ts();
+            const url = this._baseUrl + path;
             this._xhr({
                 url: url,
                 responseType: 'json',
                 success: (response) => {
-                    var downloadUrl = response['@content.downloadUrl'];
-                    var rev = response.eTag;
+                    const downloadUrl = response['@content.downloadUrl'];
+                    let rev = response.eTag;
                     if (!downloadUrl || !response.eTag) {
                         this.logger.debug('Load error', path, 'no download url', response, this.logger.ts(ts));
                         return callback && callback('no download url');
@@ -76,13 +74,13 @@ var StorageOneDrive = StorageBase.extend({
                 return callback && callback(err);
             }
             this.logger.debug('Stat', path);
-            var ts = this.logger.ts();
-            var url = this._baseUrl + path;
+            const ts = this.logger.ts();
+            const url = this._baseUrl + path;
             this._xhr({
                 url: url,
                 responseType: 'json',
                 success: (response) => {
-                    var rev = response.eTag;
+                    const rev = response.eTag;
                     if (!rev) {
                         this.logger.error('Stat error', path, 'no eTag', this.logger.ts(ts));
                         return callback && callback('no eTag');
@@ -108,8 +106,8 @@ var StorageOneDrive = StorageBase.extend({
                 return callback && callback(err);
             }
             this.logger.debug('Save', path, rev);
-            var ts = this.logger.ts();
-            var url = this._baseUrl + path + ':/content';
+            const ts = this.logger.ts();
+            const url = this._baseUrl + path + ':/content';
             this._xhr({
                 url: url,
                 method: 'PUT',
@@ -142,8 +140,8 @@ var StorageOneDrive = StorageBase.extend({
         this._oauthAuthorize(err => {
             if (err) { return callback && callback(err); }
             this.logger.debug('List');
-            var ts = this.logger.ts();
-            var url = this._baseUrl + '/drive/root/view.search?q=.kdbx&filter=' + encodeURIComponent('file ne null');
+            const ts = this.logger.ts();
+            const url = this._baseUrl + '/drive/root/view.search?q=.kdbx&filter=' + encodeURIComponent('file ne null');
             this._xhr({
                 url: url,
                 responseType: 'json',
@@ -153,7 +151,7 @@ var StorageOneDrive = StorageBase.extend({
                         return callback && callback('list error');
                     }
                     this.logger.debug('Listed', this.logger.ts(ts));
-                    var fileList = response.value
+                    const fileList = response.value
                         .filter(f => f.name && UrlUtil.isKdbx(f.name))
                         .map(f => ({
                             name: f.name,
@@ -172,8 +170,8 @@ var StorageOneDrive = StorageBase.extend({
 
     remove: function(path, callback) {
         this.logger.debug('Remove', path);
-        var ts = this.logger.ts();
-        var url = this._baseUrl + path;
+        const ts = this.logger.ts();
+        const url = this._baseUrl + path;
         this._xhr({
             url: url,
             method: 'DELETE',
@@ -194,9 +192,9 @@ var StorageOneDrive = StorageBase.extend({
         this._oauthAuthorize(err => {
             if (err) { return callback && callback(err); }
             this.logger.debug('Make dir', path);
-            var ts = this.logger.ts();
-            var url = this._baseUrl + '/drive/root/children';
-            var data = JSON.stringify({ name: path.replace('/drive/root:/', ''), folder: {} });
+            const ts = this.logger.ts();
+            const url = this._baseUrl + '/drive/root/children';
+            const data = JSON.stringify({ name: path.replace('/drive/root:/', ''), folder: {} });
             this._xhr({
                 url: url,
                 method: 'POST',
@@ -217,7 +215,7 @@ var StorageOneDrive = StorageBase.extend({
 
     setEnabled: function(enabled) {
         if (!enabled) {
-            var url = 'https://login.live.com/oauth20_logout.srf?client_id={client_id}&redirect_uri={url}'
+            const url = 'https://login.live.com/oauth20_logout.srf?client_id={client_id}&redirect_uri={url}'
                 .replace('{client_id}', this._getClientId())
                 .replace('{url}', this._getOauthRedirectUrl());
             this._oauthRevokeToken(url);
@@ -226,7 +224,7 @@ var StorageOneDrive = StorageBase.extend({
     },
 
     _getClientId: function() {
-        var clientId = this.appSettings.get('onedriveClientId');
+        let clientId = this.appSettings.get('onedriveClientId');
         if (!clientId) {
             clientId = location.origin.indexOf('localhost') >= 0 ? OneDriveClientId.Local : OneDriveClientId.Production;
         }
@@ -234,7 +232,7 @@ var StorageOneDrive = StorageBase.extend({
     },
 
     _getOAuthConfig: function() {
-        var clientId = this._getClientId();
+        const clientId = this._getClientId();
         return {
             url: 'https://login.live.com/oauth20_authorize.srf',
             scope: 'onedrive.readwrite',

@@ -1,13 +1,10 @@
-'use strict';
-
-var UrlUtil = {
+const UrlUtil = {
     multiSlashRegex: /\/{2,}/g,
-    lastPartRegex: /[^\/]+$/,
-    trimStartSlashRegex: /^\\/,
+    lastPartRegex: /\/?[^\/\\]+$/,
     kdbxEndRegex: /\.kdbx$/i,
 
     getDataFileName: function(url) {
-        var ix = url.lastIndexOf('/');
+        const ix = url.lastIndexOf('/');
         if (ix >= 0) {
             url = url.substr(ix + 1);
         }
@@ -24,11 +21,7 @@ var UrlUtil = {
     },
 
     fileToDir: function(url) {
-        return url.replace(this.lastPartRegex, '');
-    },
-
-    trimStartSlash: function(url) {
-        return url.replace(this.trimStartSlashRegex, '');
+        return url.replace(this.lastPartRegex, '') || '/';
     }
 };
 

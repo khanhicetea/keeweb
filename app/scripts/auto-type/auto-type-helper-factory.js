@@ -1,14 +1,12 @@
-'use strict';
+const Launcher = require('../comp/launcher');
 
-var Launcher = require('../comp/launcher');
-
-var AutoTypeHelperFactory = {
+const AutoTypeHelperFactory = {
     create: function() {
-        if (!Launcher) {
-            return null;
+        if (Launcher && Launcher.autoTypeSupported) {
+            const AutoTypeHelper = require('./helper/auto-type-helper-' + Launcher.platform());
+            return new AutoTypeHelper();
         }
-        var AutoTypeHelper = require('./helper/auto-type-helper-' + Launcher.platform());
-        return new AutoTypeHelper();
+        return null;
     }
 };
 

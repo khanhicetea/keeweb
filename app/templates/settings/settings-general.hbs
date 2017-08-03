@@ -44,7 +44,7 @@
             {{#each locales as |name key|}}
                 <option value="{{key}}" {{#ifeq key ../activeLocale}}selected{{/ifeq}}>{{name}}</option>
             {{/each}}
-            <option value="...">({{res 'setGenLocImprove'}})</option>
+            <option value="...">({{res 'setGenLocOther'}})</option>
         </select>
     </div>
     {{/if}}
@@ -64,6 +64,16 @@
             <option value="2" {{#ifeq fontSize 2}}selected{{/ifeq}}>{{res 'setGenFontSizeLargest'}}</option>
         </select>
     </div>
+    {{#if supportsTitleBarStyles}}
+    <div>
+      <label for="settings__general-titlebar-style">{{res 'setGenTitlebarStyle'}}:</label>
+      <select class="settings__general-titlebar-style settings__select input-base" id="settings__general-titlebar-style">
+        <option value="default" {{#ifeq titlebarStyle 'default'}}selected{{/ifeq}}>{{res 'setGenTitlebarStyleDefault'}}</option>
+        <option value="hidden" {{#ifeq titlebarStyle 'hidden'}}selected{{/ifeq}}>{{res 'setGenTitlebarStyleHidden'}}</option>
+        <option value="hidden-inset" {{#ifeq titlebarStyle 'hidden-inset'}}selected{{/ifeq}}>{{res 'setGenTitlebarStyleHiddenInset'}}</option>
+      </select>
+    </div>
+    {{/if}}
     <div>
         <input type="checkbox" class="settings__input input-base settings__general-expand" id="settings__general-expand" {{#if expandGroups}}checked{{/if}} />
         <label for="settings__general-expand">{{res 'setGenShowSubgroups'}}</label>
@@ -86,9 +96,12 @@
         <label for="settings__general-auto-save">{{res 'setGenAutoSync'}}</label>
     </div>
     <div>
-        <input type="checkbox" class="settings__input input-base settings__general-remember-key-files" id="settings__general-remember-key-files"
-               {{#if rememberKeyFiles}}checked{{/if}} />
-        <label for="settings__general-remember-key-files">{{res 'setGenRememberKeyFiles'}}</label>
+        <label for="settings__general-remember-key-files">{{res 'setGenRememberKeyFiles'}}:</label>
+        <select class="settings__general-remember-key-files settings__select input-base" id="settings__general-remember-key-files">
+            <option value="" {{#unless rememberKeyFiles}}selected{{/unless}}>{{res 'setGenNoRememberKeyFiles'}}</option>
+            <option value="data" {{#ifeq rememberKeyFiles 'data'}}selected{{/ifeq}}>{{res 'setGenRememberKeyFilesData'}}</option>
+            {{#if supportFiles}}<option value="path" {{#ifeq rememberKeyFiles 'path'}}selected{{/ifeq}}>{{res 'setGenRememberKeyFilesPath'}}</option>{{/if}}
+        </select>
     </div>
     <div>
         <label for="settings__general-idle-minutes">{{res 'setGenLockInactive'}}:</label>
@@ -98,6 +111,8 @@
             <option value="10" {{#ifeq idleMinutes 10}}selected{{/ifeq}}>{{#res 'setGenLockMinutes'}}10{{/res}}</option>
             <option value="15" {{#ifeq idleMinutes 15}}selected{{/ifeq}}>{{#res 'setGenLockMinutes'}}15{{/res}}</option>
             <option value="60" {{#ifeq idleMinutes 60}}selected{{/ifeq}}>{{res 'setGenLockHour'}}</option>
+            <option value="720" {{#ifeq idleMinutes 720}}selected{{/ifeq}}>{{#res 'setGenLockHours'}}12{{/res}}</option>
+            <option value="1440" {{#ifeq idleMinutes 1440}}selected{{/ifeq}}>{{res 'setGenLockDay'}}</option>
         </select>
     </div>
     {{#if canClearClipboard}}
@@ -131,7 +146,13 @@
                {{#if lockOnCopy}}checked{{/if}} />
         <label for="settings__general-lock-on-copy">{{res 'setGenLockCopy'}}</label>
     </div>
-
+    {{#if canAutoType}}
+    <div>
+        <input type="checkbox" class="settings__input input-base settings__general-lock-on-auto-type" id="settings__general-lock-on-auto-type"
+               {{#if lockOnAutoType}}checked{{/if}} />
+        <label for="settings__general-lock-on-auto-type">{{res 'setGenLockAutoType'}}</label>
+    </div>
+    {{/if}}
     <h2>{{res 'setGenStorage'}}</h2>
     {{#each storageProviders as |prv|}}
     <h4 class="settings__general-storage-header"><input

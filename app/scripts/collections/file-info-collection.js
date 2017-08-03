@@ -1,20 +1,19 @@
-'use strict';
+const Backbone = require('backbone');
+const FileInfoModel = require('../models/file-info-model');
+const SettingsStore = require('../comp/settings-store');
 
-var Backbone = require('backbone'),
-    FileInfoModel = require('../models/file-info-model'),
-    SettingsStore = require('../comp/settings-store');
-
-var FileInfoCollection = Backbone.Collection.extend({
+const FileInfoCollection = Backbone.Collection.extend({
     model: FileInfoModel,
 
     initialize: function () {
     },
 
     load: function () {
-        var data = SettingsStore.load('file-info');
-        if (data) {
-            this.reset(data, {silent: true});
-        }
+        return SettingsStore.load('file-info').then(data => {
+            if (data) {
+                this.reset(data, {silent: true});
+            }
+        });
     },
 
     save: function () {
@@ -38,10 +37,6 @@ var FileInfoCollection = Backbone.Collection.extend({
     }
 });
 
-FileInfoCollection.load = function() {
-    var coll = new FileInfoCollection();
-    coll.load();
-    return coll;
-};
+FileInfoCollection.instance = new FileInfoCollection();
 
 module.exports = FileInfoCollection;

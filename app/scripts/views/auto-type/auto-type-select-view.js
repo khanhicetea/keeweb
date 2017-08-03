@@ -1,5 +1,3 @@
-'use strict';
-
 const Backbone = require('backbone');
 const Keys = require('../../const/keys');
 const KeyHandler = require('../../comp/key-handler');
@@ -8,7 +6,7 @@ const AppSettingsModel = require('../../models/app-settings-model');
 const EntryPresenter = require('../../presenters/entry-presenter');
 const Scrollable = require('../../mixins/scrollable');
 
-let AutoTypePopupView = Backbone.View.extend({
+const AutoTypePopupView = Backbone.View.extend({
     el: 'body',
 
     template: require('templates/auto-type/auto-type-select.hbs'),
@@ -16,7 +14,6 @@ let AutoTypePopupView = Backbone.View.extend({
 
     events: {
         'click .at-select__header-filter-clear': 'clearFilterText',
-        'click .at-select__message-clear-filter': 'clearFilterWindow',
         'click .at-select__item': 'itemClicked'
     },
 
@@ -37,20 +34,19 @@ let AutoTypePopupView = Backbone.View.extend({
     },
 
     render() {
-        let topMessage, topClearFilterVisible;
+        let topMessage;
         if (this.model.filter.title || this.model.filter.url) {
             topMessage = Locale.autoTypeMsgMatchedByWindow.replace('{}',
                 this.model.filter.title || this.model.filter.url);
-            topClearFilterVisible = !this.model.filter.ignoreWindowInfo;
         } else {
             topMessage = Locale.autoTypeMsgNoWindow;
         }
-        let noColor = AppSettingsModel.instance.get('colorfulIcons') ? '' : 'grayscale';
+        const noColor = AppSettingsModel.instance.get('colorfulIcons') ? '' : 'grayscale';
         this.entries = this.model.filter.getEntries();
         this.result = this.entries.first();
-        let presenter = new EntryPresenter(null, noColor, this.result && this.result.id);
+        const presenter = new EntryPresenter(null, noColor, this.result && this.result.id);
         let itemsHtml = '';
-        let itemTemplate = this.itemTemplate;
+        const itemTemplate = this.itemTemplate;
         this.entries.forEach(entry => {
             presenter.present(entry);
             itemsHtml += itemTemplate(presenter);
@@ -58,7 +54,6 @@ let AutoTypePopupView = Backbone.View.extend({
         this.renderTemplate({
             filterText: this.model.filter.text,
             topMessage: topMessage,
-            topClearFilterVisible: topClearFilterVisible,
             itemsHtml: itemsHtml
         });
         document.activeElement.blur();
@@ -104,7 +99,7 @@ let AutoTypePopupView = Backbone.View.extend({
 
     upPressed(e) {
         e.preventDefault();
-        let activeIndex = this.entries.indexOf(this.result) - 1;
+        const activeIndex = this.entries.indexOf(this.result) - 1;
         if (activeIndex >= 0) {
             this.result = this.entries.at(activeIndex);
             this.highlightActive();
@@ -113,7 +108,7 @@ let AutoTypePopupView = Backbone.View.extend({
 
     downPressed(e) {
         e.preventDefault();
-        let activeIndex = this.entries.indexOf(this.result) + 1;
+        const activeIndex = this.entries.indexOf(this.result) + 1;
         if (activeIndex < this.entries.length) {
             this.result = this.entries.at(activeIndex);
             this.highlightActive();
@@ -122,10 +117,10 @@ let AutoTypePopupView = Backbone.View.extend({
 
     highlightActive() {
         this.$el.find('.at-select__item').removeClass('at-select__item--active');
-        let activeItem = this.$el.find('.at-select__item[data-id="' + this.result.id + '"]');
+        const activeItem = this.$el.find('.at-select__item[data-id="' + this.result.id + '"]');
         activeItem.addClass('at-select__item--active');
-        let itemRect = activeItem[0].getBoundingClientRect();
-        let listRect = this.scroller[0].getBoundingClientRect();
+        const itemRect = activeItem[0].getBoundingClientRect();
+        const listRect = this.scroller[0].getBoundingClientRect();
         if (itemRect.top < listRect.top) {
             this.scroller[0].scrollTop += itemRect.top - listRect.top;
         } else if (itemRect.bottom > listRect.bottom) {
@@ -152,14 +147,9 @@ let AutoTypePopupView = Backbone.View.extend({
         this.render();
     },
 
-    clearFilterWindow() {
-        this.model.filter.ignoreWindowInfo = true;
-        this.render();
-    },
-
     itemClicked(e) {
-        let itemEl = $(e.target).closest('.at-select__item');
-        let id = itemEl.data('id');
+        const itemEl = $(e.target).closest('.at-select__item');
+        const id = itemEl.data('id');
         this.result = this.entries.get(id);
         this.closeWithResult();
     },

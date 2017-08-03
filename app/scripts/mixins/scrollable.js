@@ -1,12 +1,10 @@
-'use strict';
+const Backbone = require('backbone');
+const FeatureDetector = require('../util/feature-detector');
+const baron = require('baron');
 
-var Backbone = require('backbone'),
-    FeatureDetector = require('../util/feature-detector'),
-    baron = require('baron');
+const isEnabled = !FeatureDetector.isMobile;
 
-var isEnabled = !FeatureDetector.isMobile;
-
-var Scrollable = {
+const Scrollable = {
     createScroll: function(opts) {
         opts.$ = Backbone.$;
         // opts.cssGuru = true;
@@ -38,8 +36,8 @@ var Scrollable = {
             this.requestAnimationFrame(function() {
                 if (this.scroll) {
                     this.scroll.update();
-                    var barHeight = this.scrollerBar.height(),
-                        wrapperHeight = this.scrollerBarWrapper.height();
+                    const barHeight = this.scrollerBar.height();
+                    const wrapperHeight = this.scrollerBarWrapper.height();
                     this.scrollerBarWrapper.toggleClass('invisible', barHeight >= wrapperHeight);
                 }
             });

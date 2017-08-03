@@ -1,9 +1,7 @@
-'use strict';
+const MenuSectionModel = require('./menu-section-model');
+const GroupCollection = require('../../collections/group-collection');
 
-var MenuSectionModel = require('./menu-section-model'),
-    GroupCollection = require('../../collections/group-collection');
-
-var GroupsMenuModel = MenuSectionModel.extend({
+const GroupsMenuModel = MenuSectionModel.extend({
     defaults: _.extend({}, MenuSectionModel.prototype.defaults, {
         scrollable: true,
         grow: true

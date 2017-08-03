@@ -1,10 +1,8 @@
-'use strict';
+const Backbone = require('backbone');
+const RuntimeInfo = require('../../comp/runtime-info');
+const Links = require('../../const/links');
 
-var Backbone = require('backbone'),
-    RuntimeInfo = require('../../comp/runtime-info'),
-    Links = require('../../const/links');
-
-var SettingsAboutView = Backbone.View.extend({
+const SettingsAboutView = Backbone.View.extend({
     template: require('templates/settings/settings-about.hbs'),
 
     render: function() {
@@ -12,7 +10,8 @@ var SettingsAboutView = Backbone.View.extend({
             version: RuntimeInfo.version,
             licenseLink: Links.License,
             licenseLinkApache: Links.LicenseApache,
-            repoLink: Links.Repo
+            repoLink: Links.Repo,
+            donationLink: Links.Donation
         });
     }
 });

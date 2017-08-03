@@ -1,9 +1,7 @@
-'use strict';
+const Backbone = require('backbone');
+const SettingsStore = require('../comp/settings-store');
 
-var Backbone = require('backbone'),
-    SettingsStore = require('../comp/settings-store');
-
-var UpdateModel = Backbone.Model.extend({
+const UpdateModel = Backbone.Model.extend({
     defaults: {
         lastSuccessCheckDate: null,
         lastCheckDate: null,
@@ -21,21 +19,23 @@ var UpdateModel = Backbone.Model.extend({
     },
 
     load: function() {
-        var data = SettingsStore.load('update-info');
-        if (data) {
-            try {
-                _.each(data, (val, key) => {
-                    if (/Date$/.test(key)) {
-                        data[key] = val ? new Date(val) : null;
-                    }
-                });
-                this.set(data, { silent: true });
-            } catch (e) { /* failed to load model */ }
-        }
+        return SettingsStore.load('update-info').then(data => {
+            if (data) {
+                try {
+                    _.each(data, (val, key) => {
+                        if (/Date$/.test(key)) {
+                            data[key] = val ? new Date(val) : null;
+                        }
+                    });
+                    this.set(data, {silent: true});
+                } catch (e) { /* failed to load model */
+                }
+            }
+        });
     },
 
     save: function() {
-        var attr = _.clone(this.attributes);
+        const attr = _.clone(this.attributes);
         Object.keys(attr).forEach(key => {
             if (key.lastIndexOf('update', 0) === 0) {
                 delete attr[key];
@@ -46,6 +46,5 @@ var UpdateModel = Backbone.Model.extend({
 });
 
 UpdateModel.instance = new UpdateModel();
-UpdateModel.instance.load();
 
 module.exports = UpdateModel;

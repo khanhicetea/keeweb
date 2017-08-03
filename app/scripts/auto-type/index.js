@@ -1,22 +1,21 @@
-'use strict';
+const Backbone = require('backbone');
+const AutoTypeParser = require('./auto-type-parser');
+const AutoTypeFilter = require('./auto-type-filter');
+const AutoTypeHelperFactory = require('./auto-type-helper-factory');
+const Launcher = require('../comp/launcher');
+const Alerts = require('../comp/alerts');
+const AutoTypeSelectView = require('../views/auto-type/auto-type-select-view');
+const Logger = require('../util/logger');
+const Locale = require('../util/locale');
+const Timeouts = require('../const/timeouts');
+const AppSettingsModel = require('../models/app-settings-model');
 
-var Backbone = require('backbone'),
-    AutoTypeParser = require('./auto-type-parser'),
-    AutoTypeFilter = require('./auto-type-filter'),
-    AutoTypeHelperFactory = require('./auto-type-helper-factory'),
-    Launcher = require('../comp/launcher'),
-    Alerts = require('../comp/alerts'),
-    AutoTypeSelectView = require('../views/auto-type/auto-type-select-view'),
-    Logger = require('../util/logger'),
-    Locale = require('../util/locale'),
-    Timeouts = require('../const/timeouts');
+const logger = new Logger('auto-type');
+const clearTextAutoTypeLog = localStorage.autoTypeDebug;
 
-var logger = new Logger('auto-type');
-var clearTextAutoTypeLog = localStorage.autoTypeDebug;
-
-var AutoType = {
+const AutoType = {
     helper: AutoTypeHelperFactory.create(),
-    enabled: !!Launcher,
+    enabled: !!(Launcher && Launcher.autoTypeSupported),
     selectEntryView: false,
     pendingEvent: null,
     running: false,
@@ -31,7 +30,7 @@ var AutoType = {
     },
 
     handleEvent(e) {
-        let entry = e && e.entry || null;
+        const entry = e && e.entry || null;
         logger.debug('Auto type event', entry);
         if (this.running) {
             logger.debug('Already running, skipping event');
@@ -63,16 +62,20 @@ var AutoType = {
                 });
             }
         });
+
+        if (AppSettingsModel.instance.get('lockOnAutoType')) {
+            Backbone.trigger('lock-workspace');
+        }
     },
 
     run(entry, callback) {
         this.running = true;
-        var sequence = entry.getEffectiveAutoTypeSeq();
+        const sequence = entry.getEffectiveAutoTypeSeq();
         logger.debug('Start', sequence);
-        var ts = logger.ts();
+        const ts = logger.ts();
         try {
-            var parser = new AutoTypeParser(sequence);
-            var runner = parser.parse();
+            const parser = new AutoTypeParser(sequence);
+            const runner = parser.parse();
             logger.debug('Parsed', this.printOps(runner.ops));
             runner.resolve(entry, err => {
                 if (err) {
@@ -110,8 +113,8 @@ var AutoType = {
 
     validate(entry, sequence, callback) {
         try {
-            var parser = new AutoTypeParser(sequence);
-            var runner = parser.parse();
+            const parser = new AutoTypeParser(sequence);
+            const runner = parser.parse();
             runner.resolve(entry, callback);
         } catch (ex) {
             return callback(ex);
@@ -123,12 +126,12 @@ var AutoType = {
     },
 
     printOp(op) {
-        var mod = op.mod ? Object.keys(op.mod).join('') : '';
+        const mod = op.mod ? Object.keys(op.mod).join('') : '';
         if (op.type === 'group') {
             return mod + this.printOps(op.value);
         }
         if (op.type === 'text') {
-            var value = op.value;
+            let value = op.value;
             if (!clearTextAutoTypeLog) {
                 value = value.replace(/./g, '*');
             }
@@ -161,8 +164,8 @@ var AutoType = {
 
     selectEntryAndRun() {
         this.getActiveWindowTitle((e, title, url) => {
-            let filter = new AutoTypeFilter({title, url}, this.appModel);
-            let evt = { filter };
+            const filter = new AutoTypeFilter({title, url}, this.appModel);
+            const evt = { filter };
             if (!this.appModel.files.hasOpenFiles()) {
                 this.pendingEvent = evt;
                 this.appModel.files.once('update', this.processPendingEvent, this);
@@ -179,7 +182,7 @@ var AutoType = {
     },
 
     processEventWithFilter(evt) {
-        let entries = evt.filter.getEntries();
+        const entries = evt.filter.getEntries();
         if (entries.length === 1) {
             this.hideWindow(() => {
                 this.runAndHandleResult(entries.at(0));
@@ -187,6 +190,7 @@ var AutoType = {
             return;
         }
         this.focusMainWindow();
+        evt.filter.ignoreWindowInfo = true;
         this.selectEntryView = new AutoTypeSelectView({
             model: { filter: evt.filter }
         }).render();
@@ -216,7 +220,7 @@ var AutoType = {
             return;
         }
         logger.debug('processing pending auto-type event');
-        let evt = this.pendingEvent;
+        const evt = this.pendingEvent;
         this.appModel.files.off('update', this.processPendingEvent, this);
         this.pendingEvent = null;
         this.processEventWithFilter(evt);

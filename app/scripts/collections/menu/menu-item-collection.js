@@ -1,9 +1,7 @@
-'use strict';
+const Backbone = require('backbone');
+const MenuItemModel = require('../../models/menu/menu-item-model');
 
-var Backbone = require('backbone'),
-    MenuItemModel = require('../../models/menu/menu-item-model');
-
-var MenuItemCollection = Backbone.Collection.extend({
+const MenuItemCollection = Backbone.Collection.extend({
     model: MenuItemModel
 });
 

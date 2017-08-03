@@ -1,8 +1,6 @@
-'use strict';
+const Backbone = require('backbone');
 
-var Backbone = require('backbone');
-
-var MenuOptionModel = Backbone.Model.extend({
+const MenuOptionModel = Backbone.Model.extend({
     defaults: {
         title: '',
         cls: '',

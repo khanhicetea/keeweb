@@ -1,8 +1,6 @@
-'use strict';
+const Backbone = require('backbone');
 
-var Backbone = require('backbone');
-
-var FileInfoModel = Backbone.Model.extend({
+const FileInfoModel = Backbone.Model.extend({
     defaults: {
         id: '',
         name: '',
@@ -16,7 +14,8 @@ var FileInfoModel = Backbone.Model.extend({
         keyFileName: null,
         keyFileHash: null,
         opts: null,
-        backup: null
+        backup: null,
+        fingerprint: null
     },
 
     initialize: function(data, options) {

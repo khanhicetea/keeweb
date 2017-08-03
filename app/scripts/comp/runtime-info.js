@@ -1,8 +1,6 @@
-'use strict';
+const Launcher = require('../comp/launcher');
 
-var Launcher = require('../comp/launcher');
-
-var RuntimeInfo = {
+const RuntimeInfo = {
     version: '@@VERSION',
     buildDate: '@@DATE',
     commit: '@@COMMIT',

@@ -1,8 +1,6 @@
-'use strict';
+const Backbone = require('backbone');
 
-var Backbone = require('backbone');
-
-var AttachmentModel = Backbone.Model.extend({
+const AttachmentModel = Backbone.Model.extend({
     defaults: {},
 
     initialize: function() {
@@ -17,7 +15,7 @@ var AttachmentModel = Backbone.Model.extend({
     },
 
     _getExtension: function(fileName) {
-        var ext = fileName ? fileName.split('.').pop() : undefined;
+        const ext = fileName ? fileName.split('.').pop() : undefined;
         return ext ? ext.toLowerCase() : undefined;
     },
 
@@ -65,7 +63,7 @@ var AttachmentModel = Backbone.Model.extend({
     },
 
     getBinary: function() {
-        var data = this.data;
+        let data = this.data;
         if (data && data.ref) {
             data = data.value;
         }
@@ -82,7 +80,7 @@ var AttachmentModel = Backbone.Model.extend({
 });
 
 AttachmentModel.fromAttachment = function(att) {
-    var model = new AttachmentModel();
+    const model = new AttachmentModel();
     model.setAttachment(att);
     return model;
 };

@@ -1,43 +1,62 @@
-'use strict';
+const Launcher = require('./launcher');
+const StringUtil = require('../util/string-util');
+const Logger = require('../util/logger');
 
-var Launcher = require('./launcher'),
-    StringUtil = require('../util/string-util'),
-    Logger = require('../util/logger');
+const logger = new Logger('settings');
 
-var logger = new Logger('settings');
-
-var SettingsStore = {
+const SettingsStore = {
     fileName: function(key) {
-        return key + '.json';
+        return `${key}.json`;
     },
 
     load: function(key) {
-        try {
+        return new Promise(resolve => {
             if (Launcher) {
-                var settingsFile = Launcher.getUserDataPath(this.fileName(key));
-                if (Launcher.fileExists(settingsFile)) {
-                    return JSON.parse(Launcher.readFile(settingsFile, 'utf8'));
-                }
+                const settingsFile = Launcher.getUserDataPath(this.fileName(key));
+                Launcher.fileExists(settingsFile, exists => {
+                    if (exists) {
+                        Launcher.readFile(settingsFile, 'utf8', data => {
+                            return this.parseData(key, data, resolve);
+                        });
+                    } else {
+                        resolve();
+                    }
+                });
             } else {
-                var data = localStorage[StringUtil.camelCase(key)];
-                return data ? JSON.parse(data) : undefined;
+                const data = localStorage[StringUtil.camelCase(key)];
+                return this.parseData(key, data, resolve);
+            }
+        });
+    },
+
+    parseData: function(key, data, resolve) {
+        try {
+            if (data) {
+                return resolve(JSON.parse(data));
+            } else {
+                resolve();
             }
         } catch (e) {
             logger.error('Error loading ' + key, e);
+            resolve();
         }
-        return null;
     },
 
     save: function(key, data) {
-        try {
+        return new Promise(resolve => {
             if (Launcher) {
-                Launcher.writeFile(Launcher.getUserDataPath(this.fileName(key)), JSON.stringify(data));
+                const settingsFile = Launcher.getUserDataPath(this.fileName(key));
+                Launcher.writeFile(settingsFile, JSON.stringify(data), err => {
+                    if (err) {
+                        logger.error(`Error saving ${key}`, err);
+                    }
+                    resolve();
+                });
             } else if (typeof localStorage !== 'undefined') {
                 localStorage[StringUtil.camelCase(key)] = JSON.stringify(data);
+                resolve();
             }
-        } catch (e) {
-            logger.error('Error saving ' + key, e);
-        }
+        });
     }
 };
 

@@ -1,9 +1,7 @@
-'use strict';
+const Backbone = require('backbone');
+const SettingsStore = require('../comp/settings-store');
 
-var Backbone = require('backbone'),
-    SettingsStore = require('../comp/settings-store');
-
-var RuntimeDataModel = Backbone.Model.extend({
+const RuntimeDataModel = Backbone.Model.extend({
     defaults: {},
 
     initialize: function() {
@@ -11,10 +9,11 @@ var RuntimeDataModel = Backbone.Model.extend({
     },
 
     load: function() {
-        var data = SettingsStore.load('runtime-data');
-        if (data) {
-            this.set(data, {silent: true});
-        }
+        return SettingsStore.load('runtime-data').then(data => {
+            if (data) {
+                this.set(data, {silent: true});
+            }
+        });
     },
 
     save: function() {
@@ -23,6 +22,5 @@ var RuntimeDataModel = Backbone.Model.extend({
 });
 
 RuntimeDataModel.instance = new RuntimeDataModel();
-RuntimeDataModel.instance.load();
 
 module.exports = RuntimeDataModel;

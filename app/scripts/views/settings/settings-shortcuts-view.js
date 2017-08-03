@@ -1,10 +1,8 @@
-'use strict';
+const Backbone = require('backbone');
+const Launcher = require('../../comp/launcher');
+const FeatureDetector = require('../../util/feature-detector');
 
-var Backbone = require('backbone'),
-    Launcher = require('../../comp/launcher'),
-    FeatureDetector = require('../../util/feature-detector');
-
-var SettingsShortcutsView = Backbone.View.extend({
+const SettingsShortcutsView = Backbone.View.extend({
     template: require('templates/settings/settings-shortcuts.hbs'),
 
     render: function() {

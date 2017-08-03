@@ -1,9 +1,7 @@
-'use strict';
+const Backbone = require('backbone');
+const SettingsStore = require('../comp/settings-store');
 
-var Backbone = require('backbone'),
-    SettingsStore = require('../comp/settings-store');
-
-var AppSettingsModel = Backbone.Model.extend({
+const AppSettingsModel = Backbone.Model.extend({
     defaults: {
         theme: 'fb',
         locale: null,
@@ -19,9 +17,12 @@ var AppSettingsModel = Backbone.Model.extend({
         minimizeOnClose: false,
         tableView: false,
         colorfulIcons: false,
+        titlebarStyle: 'default',
         lockOnMinimize: true,
         lockOnCopy: false,
+        lockOnAutoType: false,
         helpTipCopyShown: false,
+        templateHelpShown: false,
         skipOpenLocalWarn: false,
         hideEmptyFields: false,
         skipHttpsWarning: false,
@@ -29,11 +30,15 @@ var AppSettingsModel = Backbone.Model.extend({
         fontSize: 0,
         tableViewColumns: null,
         generatorPresets: null,
+        cacheConfigSettings: false,
+
         canOpen: true,
         canOpenDemo: true,
         canOpenSettings: true,
         canCreate: true,
         canImportXml: true,
+        canRemoveLatest: true,
+
         dropbox: true,
         webdav: true,
         gdrive: true,
@@ -45,9 +50,20 @@ var AppSettingsModel = Backbone.Model.extend({
     },
 
     load: function() {
-        var data = SettingsStore.load('app-settings');
-        if (data) {
-            this.set(data, {silent: true});
+        return SettingsStore.load('app-settings').then(data => {
+            if (data) {
+                this.upgrade(data);
+                this.set(data, {silent: true});
+            }
+        });
+    },
+
+    upgrade: function(data) {
+        if (data.rememberKeyFiles === true) {
+            data.rememberKeyFiles = 'data';
+        }
+        if (data.versionWarningShown) {
+            delete data.versionWarningShown;
         }
     },
 
@@ -57,6 +73,5 @@ var AppSettingsModel = Backbone.Model.extend({
 });
 
 AppSettingsModel.instance = new AppSettingsModel();
-AppSettingsModel.instance.load();
 
 module.exports = AppSettingsModel;

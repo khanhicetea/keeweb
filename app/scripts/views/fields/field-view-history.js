@@ -1,14 +1,12 @@
-'use strict';
+const FieldView = require('./field-view');
+const Locale = require('../../util/locale');
 
-var FieldView = require('./field-view'),
-    Locale = require('../../util/locale');
-
-var FieldViewHistory = FieldView.extend({
+const FieldViewHistory = FieldView.extend({
     renderValue: function(value) {
         if (!value.length) {
             return Locale.detHistoryEmpty;
         }
-        var text = value.length + ' ' + (value.length % 10 === 1 ? Locale.detHistoryRec : Locale.detHistoryRecs);
+        let text = value.length + ' ' + (value.length % 10 === 1 ? Locale.detHistoryRec : Locale.detHistoryRecs);
         if (value.unsaved) {
             text += ' (' + Locale.detHistoryModified + ')';
         }
