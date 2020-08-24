@@ -31,6 +31,7 @@
     "dropbox": true,
     "dropboxFolder": null,
     "dropboxAppKey": "lmhk153wreritqe",
+    "dropboxSecret": "l54kexgz82c6g80",
 
     "webdav": false,
     "webdavSaveMethod": "move",
